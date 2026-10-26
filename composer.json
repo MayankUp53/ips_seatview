@@ -5,17 +5,18 @@
     "type": "project",
     "license": "MIT",
     "require": {
-        "php": ">=5.6",
-        "cakephp/cakephp": "3.5.*",
-        "cakephp/migrations": "^1.0",
-        "cakephp/plugin-installer": "^1.0",
-        "josegonzalez/dotenv": "2.*",
-        "mobiledetect/mobiledetectlib": "2.*"
+        "php": "^8.2",
+        "cakephp/cakephp": "^5.4",
+        "cakephp/migrations": "^5.2",
+        "cakephp/plugin-installer": "^2.0",
+        "mobiledetect/mobiledetectlib": "^4.11"
     },
     "require-dev": {
-        "cakephp/bake": "^1.1",
-        "cakephp/cakephp-codesniffer": "^3.0",
-        "cakephp/debug_kit": "^3.2",
+        "cakephp/bake": "^3.8",
+        "cakephp/cakephp-codesniffer": "^5.3",
+        "cakephp/debug_kit": "^5.2",
+        "josegonzalez/dotenv": "^4.0",
+        "phpunit/phpunit": "^11.5",
         "psy/psysh": "@stable"
     },
     "suggest": {
@@ -27,18 +28,19 @@
     "autoload": {
         "psr-4": {
             "App\\": "src/"
-        }
+        },
+        "exclude-from-classmap": [
+            "src/Controller/SeatsController_updated.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Test\\": "tests/",
-            "Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
+            "App\\Test\\": "tests/"
         }
     },
     "scripts": {
         "post-install-cmd": "App\\Console\\Installer::postInstall",
         "post-create-project-cmd": "App\\Console\\Installer::postInstall",
-        "post-autoload-dump": "Cake\\Composer\\Installer\\PluginInstaller::postAutoloadDump",
         "check": [
             "@test",
             "@cs-check"
@@ -49,6 +51,15 @@
     },
     "prefer-stable": true,
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "cakephp/plugin-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "extra": {
+        "plugin-paths": [
+            "plugins/App"
+        ]
     }
 }

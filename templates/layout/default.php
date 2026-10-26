@@ -19,7 +19,7 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
 <html>
     <head>
         <meta name="viewport" content="width=device-width" >
-        
+
         <?= $this->Html->charset() ?>
 
         <title><?= $this->fetch('title') ?></title>
@@ -35,7 +35,7 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
 		<!--<link rel="stylesheet" type="text/css" href="<?= $this->Url->build("css");?>/south-street/jquery-ui-1.10.2.custom.min.css" />-->
 		<?= $this->Html->css('jquery.timepicker.css'); ?>
 		<?= $this->Html->css('jquery.datetimepicker.min'); ?>
-		
+
 		<!-- JS -->
 		<?= $this->Html->script('jquery'); ?>
 		<?= $this->Html->script('jquery-ui'); ?>
@@ -105,10 +105,10 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
                             <span class="icon-bar"></span>
                             </button>
                         </div>
-                                        
+
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2" style="background-color:#000080;">
                             <ul class="nav navbar-nav">
-                                                
+
                             <li class="<?php echo $seatview_active; ?>"><a href="<?= $this->Url->build(["controller" => "Seats","action" => "index"]);?>">シートビュー<span class="sr-only">(current)</span></a></li>
                             <li class="<?php echo $list_active; ?>"><a href="<?= $this->Url->build(["controller" => "Seats","action" => "list"]);?>">リストビュー<span class="sr-only">(current)</span></a></li>
                             <li class="<?php echo $user_active; ?>"><a href="<?= $this->Url->build(["controller" => "Users","action" => "index"]);?>">ユーザ管理<span class="sr-only">(current)</span></a></li>
@@ -126,7 +126,7 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
                 </div>
             </div>
         </header>
-        
+
 
         <div class="container clearfix">
             <?= $this->fetch('content') ?>

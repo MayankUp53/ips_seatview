@@ -2,7 +2,7 @@
 namespace App\Controller\Component;
 
 use Cake\Controller\Component;
-use Cake\Network\Exception\NotFoundException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\Utility\Hash;
 use Cake\Datasource\ConnectionManager;
 
@@ -87,10 +87,10 @@ class PaginatorForPdoComponent extends Component
             'scope' => null,
         ];
 
-        if (!$request->getParam('paging')) {
+        if (!$request->getAttribute('paging')) {
             $request->params['paging'] = [];
         }
-        $request->params['paging'] = [$alias => $paging] + (array)$request->getParam('paging');
+        $request->params['paging'] = [$alias => $paging] + (array)$request->getAttribute('paging');
 
         if ($requestedPage > $page) {
             throw new NotFoundException();

@@ -6,7 +6,7 @@ use Cake\ORM\TableRegistry; //追加
 use Cake\Routing\Router; //追加
 
 //API実行用
-use Cake\Network\Http\Client;
+use Cake\Http\Client;
 use Cake\Http\Response;
 
 /**
@@ -18,7 +18,7 @@ use Cake\Http\Response;
  */
 class SeatsController extends AppController{
 
-    public function initialize(){
+    public function initialize(): void{
         //$this->loadComponent('RequestHandler'); // Ajax用コンポーネント
         $this->loadComponent('Flash');
         $this->setListValue();
@@ -33,8 +33,8 @@ class SeatsController extends AppController{
         //シートビュー画面
 
         //アメヨのセッションID
-        $session = $this->request->session();
-		
+        $session = $this->request->getSession();
+
         $sessionId = $session->read('sessionId');
 
         if (empty($sessionId)){
@@ -77,7 +77,7 @@ class SeatsController extends AppController{
         if ($this->request->is('ajax')) {
 
             //アメヨのセッションID
-            $session = $this->request->session();
+            $session = $this->request->getSession();
             $sessionId = $session->read('sessionId');
             //Calling Ping-Session API
             $res = $this->pingSessionAPI($sessionId);
@@ -331,15 +331,15 @@ class SeatsController extends AppController{
         $edit_url = Router::url(['controller' => 'Seats', 'action' => 'edit'], false)."/";
 
 		//ユーザID
-        $Locations = TableRegistry::get('Locations');
-        $userOpt = $Locations->find('list', ['keyField' => 'location','valueField' => 'user_id'])->where(['deleted is null'])->toArray();
+        $Locations = \Cake\ORM\TableRegistry::getTableLocator()->get('Locations');
+        $userOpt = $Locations->find('list', keyField: 'location', valueField: 'user_id')->where(['deleted is null'])->toArray();
 
 		//内線番号
-        $extOpt = $Locations->find('list', ['keyField' => 'location','valueField' => 'extension'])->where(['deleted is null'])->toArray();
+        $extOpt = $Locations->find('list', keyField: 'location', valueField: 'extension')->where(['deleted is null'])->toArray();
 
         //ユーザ名
-        $Users = TableRegistry::get('Users');
-        $userNameOpt = $Users->find('list', ['keyField' => 'user_id','valueField' => 'user_name'])->where(['deleted is null'])->toArray();
+        $Users = \Cake\ORM\TableRegistry::getTableLocator()->get('Users');
+        $userNameOpt = $Users->find('list', keyField: 'user_id', valueField: 'user_name')->where(['deleted is null'])->toArray();
 
         $arr['editUrl'] = $edit_url;
         $arr['class'] = $class;
@@ -393,7 +393,7 @@ class SeatsController extends AppController{
                 $arr['userName'] = $userName;
                 $arr['status'] = $status;
                 $arr['queue'] = $queue;
-		
+
                 $arr['time'] = $time;
 
                 return '<td ondblclick="window.open(\''.$arr['editUrl'].$arr['location'].'\',null,\'width=400,height=320\');"'.$arr['class'].' >'.$arr['extension'].'<br>'.$arr['userName'].'<br><span>'.$arr['status'].'</span><br>'.$arr['queue'].'<br>'.$arr['time'].'</td>';
@@ -417,7 +417,7 @@ class SeatsController extends AppController{
 				$isOnAutoCall = $data[$keyIndex]['isOnAutoCall'];
                 $isWorking = $data[$keyIndex]['isWorking'];
                 $isOnHold = $data[$keyIndex]['isOnHold'];
-                
+
                 if ($status == "inactive" && $isWorking == true){
                     $status = "待機中";
                     $class = "style=\"background-color:#98fb98\"";
@@ -463,7 +463,7 @@ class SeatsController extends AppController{
         //リストビュー画面
 
         //アメヨのセッションID
-        $session = $this->request->session();
+        $session = $this->request->getSession();
         $sessionId = $session->read('sessionId');
 
         //Calling Ping-Session API
@@ -545,7 +545,7 @@ class SeatsController extends AppController{
         $http = new Client();
         $response = $http->post($url,json_encode($option),['headers' => $header]);
         /*$data = json_decode($response->body(),true);
-        
+
         debug($data);
         $this->set(compact('data'));
 
@@ -596,7 +596,7 @@ class SeatsController extends AppController{
 
         if (isset($data['userId']) == true){
 
-            $session = $this->request->session();
+            $session = $this->request->getSession();
             $session->write([
                 'id' => $id,
                 'pass' => $pass,
@@ -620,7 +620,7 @@ class SeatsController extends AppController{
 	public function edit($location = null) {
 		//編集子画面
         
-        $session = $this->request->session();
+        $session = $this->request->getSession();
         $sessionId = $session->read('sessionId');
 
         if (empty($sessionId)){
@@ -630,7 +630,7 @@ class SeatsController extends AppController{
         }
         
         //$locationの存在チェック
-        $Locations = TableRegistry::get('locations');
+        $Locations = \Cake\ORM\TableRegistry::getTableLocator()->get('locations');
         $exists = $Locations->exists(['location' => $location]);
         if ($exists == false){
 
@@ -673,9 +673,9 @@ class SeatsController extends AppController{
 
             if ($Locations->save($seat)) {
                 $this->Flash->success(__('シートビューが更新されました'));
-                
+
                 //セッション書き込み（ページリダイレクト後に子画面を閉じる為に使用）
-                $session = $this->request->session();
+                $session = $this->request->getSession();
 				$session->write('edit_submit', 'yes');
 
                 //return $this->redirect(['action' => 'index']);
@@ -698,35 +698,31 @@ class SeatsController extends AppController{
 		//$authOpt = ['1'=>'General','9'=>'Administrator'];
 
 		//ユーザID
-        $Locations = TableRegistry::get('Locations');
-        $userOpt = $Locations->find('list', [
-            'keyField' => 'location',
-            'valueField' => 'user_id'
-        ])
+        $Locations = \Cake\ORM\TableRegistry::getTableLocator()->get('Locations');
+        $userOpt = $Locations->find('list',
+        keyField: 'location',
+        valueField: 'user_id')
         ->where(['deleted is null'])
         ->toArray();
 
 		//内線番号
-        $extOpt = $Locations->find('list', [
-            'keyField' => 'location',
-            'valueField' => 'extension'
-        ])
+        $extOpt = $Locations->find('list',
+        keyField: 'location',
+        valueField: 'extension')
         ->where(['deleted is null'])
         ->toArray();
 
-        $extOptById = $Locations->find('list', [
-            'keyField' => 'user_id',
-            'valueField' => 'extension'
-        ])
+        $extOptById = $Locations->find('list',
+        keyField: 'user_id',
+        valueField: 'extension')
         ->where(['deleted is null'])
         ->toArray();
 
         //ユーザ名
-        $Users = TableRegistry::get('Users');
-        $userNameOpt = $Users->find('list', [
-            'keyField' => 'user_id',
-            'valueField' => 'user_name'
-        ])
+        $Users = \Cake\ORM\TableRegistry::getTableLocator()->get('Users');
+        $userNameOpt = $Users->find('list',
+        keyField: 'user_id',
+        valueField: 'user_name')
         ->where(['deleted is null'])
         ->toArray();
 

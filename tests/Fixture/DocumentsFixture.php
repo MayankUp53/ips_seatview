@@ -46,7 +46,7 @@ class DocumentsFixture extends TestFixture
      *
      * @var array
      */
-    public $records = [
+    public array $records = [
         [
             'id' => 1,
             'doc_number' => 'Lorem ipsum dolor ',

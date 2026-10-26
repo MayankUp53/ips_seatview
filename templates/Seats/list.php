@@ -135,7 +135,7 @@ function createSeat($location,$userOpt,$extOpt,$userNameOpt,$data,$href){
         }else{
             $user_name = $userId;
         }
-        
+
         $keyIndex = array_search($userId, array_column($data, 'userId'));
 
         if (isset($data[$keyIndex])){
@@ -150,7 +150,7 @@ function createSeat($location,$userOpt,$extOpt,$userNameOpt,$data,$href){
             $status = $data[$keyIndex]['status'];
             $isWorking = $data[$keyIndex]['isWorking'];
             $isOnHold = $data[$keyIndex]['isOnHold'];
-            
+
             if ($status == "inactive" && $isWorking == true){
                 $status = "待機中";
                 $class = "background-color:#98fb98";
@@ -179,7 +179,7 @@ function createSeat($location,$userOpt,$extOpt,$userNameOpt,$data,$href){
             }
 
         }
-        
+
 
         echo "<td style=\"".$class."\" data-href=\"".$href.$location."\">".$extension."<br>".$user_name."<br><span>".$status."</span><br>".$time."</td>";
     }else{

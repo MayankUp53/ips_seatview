@@ -1,0 +1,90 @@
+name: Build and deploy Seatview
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: seatview-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      IMAGE_NAME: ips-seatview
+      IMAGE_TAG: ${{ github.sha }}
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+      DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
+      APP_ENV_FILE: ${{ vars.APP_ENV_FILE || '/etc/ips-seatview/seatview.env' }}
+      APP_PORT: ${{ vars.APP_PORT || '8080' }}
+      APP_BIND: ${{ vars.APP_BIND || '127.0.0.1' }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Validate deployment settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in DEPLOY_HOST DEPLOY_USER DEPLOY_SSH_KEY DEPLOY_KNOWN_HOSTS; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::GitHub secret $name is required."
+              exit 1
+            fi
+          done
+          if [[ ! "$DEPLOY_PORT" =~ ^[0-9]+$ || ! "$APP_PORT" =~ ^[0-9]+$ ]]; then
+            echo "::error::DEPLOY_PORT and APP_PORT must be numeric."
+            exit 1
+          fi
+
+      - name: Build PHP 8.2.35 image
+        run: docker build --pull --tag "$IMAGE_NAME:$IMAGE_TAG" .
+
+      - name: Export image archive
+        run: docker save "$IMAGE_NAME:$IMAGE_TAG" | gzip -1 > seatview-image.tar.gz
+
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+      - name: Copy image and deployment script to server
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_archive="/tmp/seatview-${IMAGE_TAG}.tar.gz"
+          remote_script="/tmp/seatview-deploy-${IMAGE_TAG}.sh"
+          scp -i "$HOME/.ssh/id_ed25519" \
+            -P "$DEPLOY_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            seatview-image.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
+          scp -i "$HOME/.ssh/id_ed25519" \
+            -P "$DEPLOY_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            deploy/remote-deploy.sh "$DEPLOY_USER@$DEPLOY_HOST:$remote_script"
+
+          printf -v remote_command '%q ' \
+            bash "$remote_script" "$remote_archive" "$APP_ENV_FILE" \
+            "$APP_PORT" "$APP_BIND" "$IMAGE_NAME" "$IMAGE_TAG"
+          ssh -i "$HOME/.ssh/id_ed25519" \
+            -p "$DEPLOY_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$DEPLOY_USER@$DEPLOY_HOST" "$remote_command"

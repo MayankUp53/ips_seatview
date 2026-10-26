@@ -23,7 +23,7 @@ class InquiriesTableTest extends TestCase
      *
      * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.inquiries',
         'app.created_users',
         'app.updated_users',
@@ -35,11 +35,11 @@ class InquiriesTableTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $config = TableRegistry::exists('Inquiries') ? [] : ['className' => InquiriesTable::class];
-        $this->Inquiries = TableRegistry::get('Inquiries', $config);
+        $this->Inquiries = \Cake\ORM\TableRegistry::getTableLocator()->get('Inquiries', $config);
     }
 
     /**
@@ -47,7 +47,7 @@ class InquiriesTableTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->Inquiries);
 
