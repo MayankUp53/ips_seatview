@@ -45,7 +45,7 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
 				<div class="panel-heading">
 					<h3 class="panel-title">AmeyoJ Seat Viewer ログイン</h3>
 				</div>
-				<?php echo $this->Form->create('User');?>
+				<?php echo $this->Form->create(null);?>
 				<table class="table">
 					<tbody>
 						<tr>
@@ -72,4 +72,3 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
 			<br />
     </body>
 </html>
-

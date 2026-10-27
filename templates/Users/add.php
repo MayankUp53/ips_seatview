@@ -5,7 +5,7 @@
  */
 ?>
 
-<?= $this->Form->create('User',['type'=>'file', 'url'=>'/users/add']); ?>
+<?= $this->Form->create(null, ['type'=>'file', 'url'=>'/users/add']); ?>
 <div class="panel panel-primary filterable fixMargin" style="border-color:#4169E1;">
     <div class="panel-heading" style="background-color:#4169E1;border-color:#4169E1;">
         <h3 class="panel-title">ユーザ新規登録</h3>

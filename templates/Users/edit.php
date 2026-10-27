@@ -50,7 +50,7 @@ $(function(){
 <!-- Test -->
 <!--<div class="preview"/>-->
 
-<?= $this->Form->create('User',['type'=>'file', 'url'=>'/users/edit/'.$id]); ?>
+<?= $this->Form->create(null, ['type'=>'file', 'url'=>'/users/edit/'.$id]); ?>
 <div class="panel panel-primary filterable fixMargin" style="border-color:#ff8c00;">
     <div class="panel-heading" style="background-color:#ff8c00;border-color:#ff8c00;">
         <h3 class="panel-title">Edit User</h3>

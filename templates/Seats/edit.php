@@ -35,7 +35,7 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
             <div class="panel-heading">
                 <h3 class="panel-title">シートビュー編集</h3>
             </div>
-            <?php echo $this->Form->create('Seat',array('type'=>'post','url'=>'/Seats/edit/'.$location));?>
+            <?php echo $this->Form->create(null, ['type'=>'post','url'=>'/Seats/edit/'.$location]);?>
             <table class="table">
                 <tbody>
                     <tr height="35">
