@@ -20,6 +20,9 @@ use Cake\Http\BaseApplication;
 use Cake\Http\MiddlewareQueue;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Application setup class.
@@ -54,11 +57,25 @@ class Application extends BaseApplication
      */
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
-        $middlewareQueue
-            // Catch any exceptions in the lower layers,
-            // and make an error page/response
-            ->add(new ErrorHandlerMiddleware(Configure::read('Error'), $this))
+        $base = rtrim((string)Configure::read('App.base', ''), '/');
 
+        $middlewareQueue->add(new ErrorHandlerMiddleware(Configure::read('Error'), $this));
+
+        if ($base !== '') {
+            // Restore the public mount path stripped by the reverse proxy.
+            $middlewareQueue->add(function (
+                ServerRequestInterface $request,
+                RequestHandlerInterface $handler
+            ) use ($base): ResponseInterface {
+                $request = $request
+                    ->withAttribute('base', $base)
+                    ->withAttribute('webroot', $base . '/');
+
+                return $handler->handle($request);
+            });
+        }
+
+        $middlewareQueue
             // Handle plugin/theme assets like CakePHP normally does.
             ->add(new AssetMiddleware())
 
