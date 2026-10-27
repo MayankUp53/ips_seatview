@@ -46,7 +46,7 @@ class CompanyStaffsFixture extends TestFixture
      *
      * @var array
      */
-    public $records = [
+    public array $records = [
         [
             'id' => 1,
             'vessel' => 'Lorem ipsum dolor sit amet',

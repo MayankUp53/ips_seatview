@@ -17,6 +17,7 @@ namespace App;
 use Cake\Core\Configure;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
 use Cake\Http\BaseApplication;
+use Cake\Http\MiddlewareQueue;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
 
@@ -29,20 +30,37 @@ use Cake\Routing\Middleware\RoutingMiddleware;
 class Application extends BaseApplication
 {
     /**
+     * Load application plugins after the bootstrap files are loaded.
+     */
+    public function bootstrap(): void
+    {
+        parent::bootstrap();
+
+        if (PHP_SAPI === 'cli') {
+            $this->addOptionalPlugin('Bake');
+            $this->addPlugin('Migrations');
+        }
+
+        if (Configure::read('debug')) {
+            $this->addPlugin('DebugKit');
+        }
+    }
+
+    /**
      * Setup the middleware queue your application will use.
      *
-     * @param \Cake\Http\MiddlewareQueue $middlewareQueue The middleware queue to setup.
+     * @param MiddlewareQueue $middlewareQueue The middleware queue to setup.
      * @return \Cake\Http\MiddlewareQueue The updated middleware queue.
      */
-    public function middleware($middlewareQueue)
+    public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
         $middlewareQueue
             // Catch any exceptions in the lower layers,
             // and make an error page/response
-            ->add(ErrorHandlerMiddleware::class)
+            ->add(new ErrorHandlerMiddleware(Configure::read('Error'), $this))
 
             // Handle plugin/theme assets like CakePHP normally does.
-            ->add(AssetMiddleware::class)
+            ->add(new AssetMiddleware())
 
             // Add routing middleware.
             ->add(new RoutingMiddleware($this));

@@ -2,20 +2,22 @@
 namespace App\Test\TestCase\Controller;
 
 use App\Controller\NewTopicsController;
-use Cake\TestSuite\IntegrationTestCase;
+use Cake\TestSuite\IntegrationTestTrait;
+use Cake\TestSuite\TestCase;
 
 /**
  * App\Controller\NewTopicsController Test Case
  */
-class NewTopicsControllerTest extends IntegrationTestCase
+class NewTopicsControllerTest extends TestCase
 {
+    use IntegrationTestTrait;
 
     /**
      * Fixtures
      *
      * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.new_topics',
         'app.posted_users',
         'app.created_users',

@@ -28,19 +28,19 @@ require __DIR__ . '/paths.php';
  * - Setting the default application paths.
  */
 require CORE_PATH . 'config' . DS . 'bootstrap.php';
+require CORE_PATH . 'src' . DS . 'functions.php';
 
 use Cake\Cache\Cache;
-use Cake\Console\ConsoleErrorHandler;
 use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Core\Configure\Engine\PhpConfig;
-use Cake\Core\Plugin;
-use Cake\Database\Type;
 use Cake\Datasource\ConnectionManager;
-use Cake\Error\ErrorHandler;
+use Cake\Error\ErrorTrap;
+use Cake\Error\ExceptionTrap;
 use Cake\Http\ServerRequest;
 use Cake\Log\Log;
-use Cake\Mailer\Email;
+use Cake\Mailer\Mailer;
+use Cake\Mailer\TransportFactory;
 use Cake\Utility\Inflector;
 use Cake\Utility\Security;
 
@@ -71,6 +71,9 @@ try {
 } catch (\Exception $e) {
     exit($e->getMessage() . "\n");
 }
+
+Configure::write('App.paths.templates', [ROOT . DS . 'templates' . DS]);
+Configure::write('App.paths.locales', [RESOURCES . 'locales' . DS]);
 
 /*
  * Load an environment local configuration file.
@@ -110,16 +113,20 @@ ini_set('intl.default_locale', Configure::read('App.defaultLocale'));
 /*
  * Register application error and exception handlers.
  */
-$isCli = PHP_SAPI === 'cli';
-if ($isCli) {
-    (new ConsoleErrorHandler(Configure::read('Error')))->register();
-} else {
-    (new ErrorHandler(Configure::read('Error')))->register();
+if (Configure::read('Error.exceptionRenderer') === 'Cake\Error\ExceptionRenderer') {
+    $renderer = PHP_SAPI === 'cli'
+        ? \Cake\Error\Renderer\ConsoleExceptionRenderer::class
+        : \Cake\Error\Renderer\WebExceptionRenderer::class;
+    Configure::write('Error.exceptionRenderer', $renderer);
 }
+
+(new ErrorTrap(Configure::read('Error')))->register();
+(new ExceptionTrap(Configure::read('Error')))->register();
 
 /*
  * Include the CLI bootstrap overrides.
  */
+$isCli = PHP_SAPI === 'cli';
 if ($isCli) {
     require __DIR__ . '/bootstrap_cli.php';
 }
@@ -145,8 +152,8 @@ if (!Configure::read('App.fullBaseUrl')) {
 
 Cache::setConfig(Configure::consume('Cache'));
 ConnectionManager::setConfig(Configure::consume('Datasources'));
-Email::setConfigTransport(Configure::consume('EmailTransport'));
-Email::setConfig(Configure::consume('Email'));
+TransportFactory::setConfig(Configure::consume('EmailTransport'));
+Mailer::setConfig(Configure::consume('Email'));
 Log::setConfig(Configure::consume('Log'));
 Security::setSalt(Configure::consume('Security.salt'));
 
@@ -172,23 +179,6 @@ ServerRequest::addDetector('tablet', function ($request) {
 });
 
 /*
- * Enable immutable time objects in the ORM.
- *
- * You can enable default locale format parsing by adding calls
- * to `useLocaleParser()`. This enables the automatic conversion of
- * locale specific date formats. For details see
- * @link https://book.cakephp.org/3.0/en/core-libraries/internationalization-and-localization.html#parsing-localized-datetime-data
- */
-Type::build('time')
-    ->useImmutable();
-Type::build('date')
-    ->useImmutable();
-Type::build('datetime')
-    ->useImmutable();
-Type::build('timestamp')
-    ->useImmutable();
-
-/*
  * Custom Inflector rules, can be set to correctly pluralize or singularize
  * table, model, controller names or whatever other string is passed to the
  * inflection functions.
@@ -212,10 +202,8 @@ Type::build('timestamp')
  * Only try to load DebugKit in development mode
  * Debug Kit should not be installed on a production system
  */
-if (Configure::read('debug')) {
-    Plugin::load('DebugKit', ['bootstrap' => true]);
-}
 
 
-// ƒLƒƒƒbƒVƒ…–³Œø‰»
+
+// ï¿½Lï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Cache::disable();

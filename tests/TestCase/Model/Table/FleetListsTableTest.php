@@ -23,7 +23,7 @@ class FleetListsTableTest extends TestCase
      *
      * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.fleet_lists',
         'app.created_users',
         'app.updated_users',
@@ -35,11 +35,11 @@ class FleetListsTableTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $config = TableRegistry::exists('FleetLists') ? [] : ['className' => FleetListsTable::class];
-        $this->FleetLists = TableRegistry::get('FleetLists', $config);
+        $this->FleetLists = \Cake\ORM\TableRegistry::getTableLocator()->get('FleetLists', $config);
     }
 
     /**
@@ -47,7 +47,7 @@ class FleetListsTableTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->FleetLists);
 

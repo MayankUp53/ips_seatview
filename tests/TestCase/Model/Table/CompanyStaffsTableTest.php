@@ -23,7 +23,7 @@ class CompanyStaffsTableTest extends TestCase
      *
      * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.company_staffs',
         'app.created_users',
         'app.updated_users',
@@ -35,11 +35,11 @@ class CompanyStaffsTableTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $config = TableRegistry::exists('CompanyStaffs') ? [] : ['className' => CompanyStaffsTable::class];
-        $this->CompanyStaffs = TableRegistry::get('CompanyStaffs', $config);
+        $this->CompanyStaffs = \Cake\ORM\TableRegistry::getTableLocator()->get('CompanyStaffs', $config);
     }
 
     /**
@@ -47,7 +47,7 @@ class CompanyStaffsTableTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->CompanyStaffs);
 

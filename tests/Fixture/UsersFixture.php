@@ -47,7 +47,7 @@ class UsersFixture extends TestFixture
      *
      * @var array
      */
-    public $records = [
+    public array $records = [
         [
             'id' => 1,
             'disp_cd' => 'Lorem ipsum dolor ',

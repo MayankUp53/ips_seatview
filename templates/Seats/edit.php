@@ -64,7 +64,7 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
         </div>
 
         <?php 
-            $session = $this->request->session();
+            $session = $this->request->getSession();
             if ($session->read('edit_submit')=='yes'){?>
                 <script>
                     $(document).ready(function() {

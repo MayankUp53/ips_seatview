@@ -2,20 +2,22 @@
 namespace App\Test\TestCase\Controller;
 
 use App\Controller\PostsController;
-use Cake\TestSuite\IntegrationTestCase;
+use Cake\TestSuite\IntegrationTestTrait;
+use Cake\TestSuite\TestCase;
 
 /**
  * App\Controller\PostsController Test Case
  */
-class PostsControllerTest extends IntegrationTestCase
+class PostsControllerTest extends TestCase
 {
+    use IntegrationTestTrait;
 
     /**
      * Fixtures
      *
      * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.posts',
         'app.res',
         'app.created_users',

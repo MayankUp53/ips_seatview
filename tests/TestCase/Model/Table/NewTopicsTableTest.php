@@ -23,7 +23,7 @@ class NewTopicsTableTest extends TestCase
      *
      * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.new_topics',
         'app.posted_users',
         'app.created_users',
@@ -36,11 +36,11 @@ class NewTopicsTableTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $config = TableRegistry::exists('NewTopics') ? [] : ['className' => NewTopicsTable::class];
-        $this->NewTopics = TableRegistry::get('NewTopics', $config);
+        $this->NewTopics = \Cake\ORM\TableRegistry::getTableLocator()->get('NewTopics', $config);
     }
 
     /**
@@ -48,7 +48,7 @@ class NewTopicsTableTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->NewTopics);
 

@@ -51,7 +51,7 @@ class PostsFixture extends TestFixture
      *
      * @var array
      */
-    public $records = [
+    public array $records = [
         [
             'id' => 1,
             'res_id' => 1,

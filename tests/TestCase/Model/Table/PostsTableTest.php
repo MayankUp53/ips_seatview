@@ -23,7 +23,7 @@ class PostsTableTest extends TestCase
      *
      * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.posts',
         'app.res',
         'app.created_users',
@@ -36,11 +36,11 @@ class PostsTableTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $config = TableRegistry::exists('Posts') ? [] : ['className' => PostsTable::class];
-        $this->Posts = TableRegistry::get('Posts', $config);
+        $this->Posts = \Cake\ORM\TableRegistry::getTableLocator()->get('Posts', $config);
     }
 
     /**
@@ -48,7 +48,7 @@ class PostsTableTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->Posts);
 

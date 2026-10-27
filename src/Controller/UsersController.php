@@ -6,7 +6,7 @@ use Cake\ORM\TableRegistry; //追加
 
 //API実行用
 
-use Cake\Network\Http\Client;
+use Cake\Http\Client;
 use Cake\Http\Response;
 /**
  * Users Controller
@@ -17,7 +17,7 @@ use Cake\Http\Response;
  */
 class UsersController extends AppController{
 
-    public function initialize(){
+    public function initialize(): void{
         $this->loadComponent('Flash');
         $this->setListValue();
     }
@@ -29,7 +29,7 @@ class UsersController extends AppController{
      */
     public function index(){
 
-        $session = $this->request->session();
+        $session = $this->request->getSession();
         $sessionId = $session->read('sessionId');
 
         if (empty($sessionId)){
@@ -59,7 +59,7 @@ class UsersController extends AppController{
      */
     public function add(){
 
-        $session = $this->request->session();
+        $session = $this->request->getSession();
         $sessionId = $session->read('sessionId');
 
         if (empty($sessionId)){
@@ -99,11 +99,11 @@ class UsersController extends AppController{
      *
      * @param string|null $id User id.
      * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Network\Exception\NotFoundException When record not found.
+     * @throws \Cake\Http\Exception\NotFoundException When record not found.
      */
     public function edit($id = null){
 
-        $session = $this->request->session();
+        $session = $this->request->getSession();
         $sessionId = $session->read('sessionId');
 
         if (empty($sessionId)){
@@ -190,7 +190,7 @@ class UsersController extends AppController{
 
         if (isset($data['userId']) == true){
 
-            $session = $this->request->session();
+            $session = $this->request->getSession();
             $session->write([
                 'id' => $id,
                 'pass' => $pass,
@@ -222,7 +222,7 @@ class UsersController extends AppController{
             if ($res == "ok"){
                 return $this->redirect(array('controller' => 'seats', 'action' => 'index'));
             }else{
-                $session = $this->request->session();
+                $session = $this->request->getSession();
                 $session->destroy();
 
                 $this->Flash->error(__('ユーザIDまたはパスワードに誤りがあります'));
@@ -256,14 +256,14 @@ class UsersController extends AppController{
             return "error";   
     }
     public function logout(){
-		 $session = $this->request->session();
+		 $session = $this->request->getSession();
 		 //print_r($session); die;
         $session->destroy();
 
         return $this->redirect(array('controller' => 'users', 'action' => 'login'));
         //return $this->redirect($this->Auth->logout());
-        /*$session = $this->request->session();
-		
+        /*$session = $this->request->getSession();
+
 		$sessionId = $session->read('sessionId');  
 		$res = $this->logoutAPI($sessionId); 
 		if($res == 'ok'){
@@ -283,11 +283,10 @@ class UsersController extends AppController{
 		$categoryOpt = ['1'=>'Company','2'=>'Deck','3'=>'Engine'];
 
 		//ユーザ
-        $Users = TableRegistry::get('Users');
-        $userOpt = $Users->find('list', [
-            'keyField' => 'id',
-            'valueField' => 'name'
-        ])
+        $Users = \Cake\ORM\TableRegistry::getTableLocator()->get('Users');
+        $userOpt = $Users->find('list',
+        keyField: 'id',
+        valueField: 'name')
         ->where(['deleted is null'])
         ->toArray();
 

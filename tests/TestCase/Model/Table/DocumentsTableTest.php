@@ -23,7 +23,7 @@ class DocumentsTableTest extends TestCase
      *
      * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'app.documents',
         'app.created_users',
         'app.updated_users',
@@ -35,11 +35,11 @@ class DocumentsTableTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $config = TableRegistry::exists('Documents') ? [] : ['className' => DocumentsTable::class];
-        $this->Documents = TableRegistry::get('Documents', $config);
+        $this->Documents = \Cake\ORM\TableRegistry::getTableLocator()->get('Documents', $config);
     }
 
     /**
@@ -47,7 +47,7 @@ class DocumentsTableTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->Documents);
 

@@ -23,7 +23,7 @@ class Location extends Entity
      *
      * @var array
      */
-    protected $_accessible = [
+    protected array $_accessible = [
         'location' => true,
         'extension' => true,
         'user_id' => true,

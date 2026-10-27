@@ -19,13 +19,15 @@ use Cake\Error\Middleware\ErrorHandlerMiddleware;
 use Cake\Http\MiddlewareQueue;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
-use Cake\TestSuite\IntegrationTestCase;
+use Cake\TestSuite\IntegrationTestTrait;
+use Cake\TestSuite\TestCase;
 
 /**
  * ApplicationTest class
  */
-class ApplicationTest extends IntegrationTestCase
+class ApplicationTest extends TestCase
 {
+    use IntegrationTestTrait;
 
     /**
      * testMiddleware
@@ -38,9 +40,10 @@ class ApplicationTest extends IntegrationTestCase
         $middleware = new MiddlewareQueue();
 
         $middleware = $app->middleware($middleware);
+        $middleware = iterator_to_array($middleware);
 
-        $this->assertInstanceOf(ErrorHandlerMiddleware::class, $middleware->get(0));
-        $this->assertInstanceOf(AssetMiddleware::class, $middleware->get(1));
-        $this->assertInstanceOf(RoutingMiddleware::class, $middleware->get(2));
+        $this->assertInstanceOf(ErrorHandlerMiddleware::class, $middleware[0]);
+        $this->assertInstanceOf(AssetMiddleware::class, $middleware[1]);
+        $this->assertInstanceOf(RoutingMiddleware::class, $middleware[2]);
     }
 }

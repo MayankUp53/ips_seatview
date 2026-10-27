@@ -1,0 +1,13 @@
+.git
+.github
+.phpunit.result.cache
+.env
+config/.env
+config/app.php
+/app.php
+logs/*
+tmp/*
+vendor/
+tests/
+plugins/DebugKit/
+src/Controller/SeatsController_updated.php
