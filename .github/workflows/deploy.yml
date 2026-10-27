@@ -1,4 +1,4 @@
-name: Build and deploy Seatview
+name: Build and deploy ips_seatviewer
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: seatview-production
+  group: ips_seatviewer-production
   cancel-in-progress: false
 
 jobs:
@@ -17,14 +17,14 @@ jobs:
     permissions:
       contents: read
     env:
-      IMAGE_NAME: ips-seatview
+      IMAGE_NAME: ips_seatviewer
       IMAGE_TAG: ${{ github.sha }}
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
       DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
       DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
       DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
-      APP_ENV_FILE: ${{ vars.APP_ENV_FILE || '/etc/ips-seatview/seatview.env' }}
+      APP_ENV_FILE: ${{ vars.APP_ENV_FILE || '/var/www/html/ips-seatview/.env' }}
       APP_PORT: ${{ vars.APP_PORT || '8080' }}
       APP_BIND: ${{ vars.APP_BIND || '127.0.0.1' }}
 
@@ -51,7 +51,7 @@ jobs:
         run: docker build --pull --tag "$IMAGE_NAME:$IMAGE_TAG" .
 
       - name: Export image archive
-        run: docker save "$IMAGE_NAME:$IMAGE_TAG" | gzip -1 > seatview-image.tar.gz
+        run: docker save "$IMAGE_NAME:$IMAGE_TAG" | gzip -1 > ips_seatviewer-image.tar.gz
 
       - name: Configure SSH
         shell: bash
@@ -67,13 +67,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          remote_archive="/tmp/seatview-${IMAGE_TAG}.tar.gz"
-          remote_script="/tmp/seatview-deploy-${IMAGE_TAG}.sh"
+          remote_archive="/tmp/ips_seatviewer-${IMAGE_TAG}.tar.gz"
+          remote_script="/tmp/ips_seatviewer-deploy-${IMAGE_TAG}.sh"
           scp -i "$HOME/.ssh/id_ed25519" \
             -P "$DEPLOY_PORT" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
-            seatview-image.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
+            ips_seatviewer-image.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
           scp -i "$HOME/.ssh/id_ed25519" \
             -P "$DEPLOY_PORT" \
             -o BatchMode=yes \

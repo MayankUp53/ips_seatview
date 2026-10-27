@@ -11,7 +11,7 @@ return [
      * Development Mode:
      * true: Errors and warnings shown.
      */
-    'debug' => filter_var(env('DEBUG', true), FILTER_VALIDATE_BOOLEAN),
+    'debug' => filter_var(env('APP_DEBUG', env('DEBUG', true)), FILTER_VALIDATE_BOOLEAN),
 
     /**
      * Configure basic information about the application.
@@ -224,16 +224,16 @@ return [
             'className' => 'Cake\Database\Connection',
             'driver' => 'Cake\Database\Driver\Mysql',
             'persistent' => false,
-            'host' => 'localhost',
+            'host' => env('DB_HOST', 'localhost'),
             /**
              * CakePHP will use the default DB port based on the driver selected
              * MySQL on MAMP uses port 8889, MAMP users will want to uncomment
              * the following line and set the port accordingly
              */
-            //'port' => 'non_standard_port_number',
-            'username' => 'my_app',
-            'password' => 'secret',
-            'database' => 'my_app',
+            'port' => env('DB_PORT', 3306),
+            'username' => env('DB_USERNAME', 'my_app'),
+            'password' => env('DB_PASSWORD', 'secret'),
+            'database' => env('DB_DATABASE', 'my_app'),
             'encoding' => 'utf8',
             'timezone' => 'UTC',
             'flags' => [],
