@@ -220,8 +220,7 @@ class UsersController extends AppController{
             $res = $this->loginAPI($id,$pass);
 
             if ($res == "ok"){
-                $appBase = rtrim((string)\Cake\Core\Configure::read('App.base', ''), '/');
-                return $this->redirect($appBase . '/seats/index');
+                return $this->redirect(['controller' => 'seats', 'action' => 'index']);
             }else{
                 $session = $this->request->getSession();
                 $session->destroy();

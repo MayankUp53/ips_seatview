@@ -45,10 +45,7 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
 				<div class="panel-heading">
 					<h3 class="panel-title">AmeyoJ Seat Viewer ログイン</h3>
 				</div>
-				<?php
-                    $appBase = rtrim((string)\Cake\Core\Configure::read('App.base', ''), '/');
-                    echo $this->Form->create(null, ['url' => $appBase . '/']);
-                ?>
+				<?php echo $this->Form->create(null, ['url' => '/']); ?>
 				<table class="table">
 					<tbody>
 						<tr>
