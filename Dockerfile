@@ -12,6 +12,7 @@ RUN apt-get update \
         libcurl4-openssl-dev \
         libicu-dev \
         libonig-dev \
+        unzip \
     && docker-php-ext-install -j"$(nproc)" curl intl mbstring opcache pdo_mysql \
     && a2enmod headers rewrite \
     && sed -ri "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/*.conf \
