@@ -233,7 +233,7 @@ class UsersController extends AppController{
         }
 
         //Default.ctpを使わない
-        $this->viewBuilder()->layout(false);
+        $this->viewBuilder()->setLayout(null);
 
     }
 	public function logoutAPI($sessionId){

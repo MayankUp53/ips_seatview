@@ -691,7 +691,7 @@ class SeatsController extends AppController{
 		$this->set(compact('id','data','location'));
 		$this->setListValue();
         //Default.ctpを使わない
-        $this->viewBuilder()->layout(false);
+        $this->viewBuilder()->setLayout(null);
 	}
     public function setListValue(){
 		//権限
