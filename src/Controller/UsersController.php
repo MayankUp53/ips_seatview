@@ -186,7 +186,7 @@ class UsersController extends AppController{
 
         $http = new Client();
         $response = $http->post($url,json_encode($option),['type' => 'json']);
-        $data = json_decode($response->body(),true);
+        $data = json_decode($response->getStringBody(), true);
 
         if (isset($data['userId']) == true){
 
@@ -215,8 +215,8 @@ class UsersController extends AppController{
         
         if ($this->request->is('post')) {
 
-            $id = $this->request['data']['loginid'];
-            $pass = $this->request['data']['password'];
+            $id = $this->request->getData('loginid');
+            $pass = $this->request->getData('password');
             $res = $this->loginAPI($id,$pass);
 
             if ($res == "ok"){

@@ -470,7 +470,7 @@ class SeatsController extends AppController{
         $res = $this->pingSessionAPI($sessionId);
 
         //セッション切れの場合は自動的に再ログインする
-        if ($res = "error"){
+        if ($res === "error"){
             $id = $session->read('id');
             $pass = $session->read('pass');
             $this->autoReLogin($id,$pass); //Re-Create New SessionId
@@ -490,12 +490,12 @@ class SeatsController extends AppController{
 
         $http = new Client();
         $response = $http->get($url, [], ['headers' => ['sessionId' => $sessionId]]);
-        $data = json_decode($response->body(),true);
+        $data = json_decode($response->getStringBody(), true);
 
 /************************/
 	$queueListURL= "http://c025.ameyoj.com:8888/ameyorestapi/cc/agentQueues/getByCampaign?campaignId=1";
         $response1 = $http->get($queueListURL, [], ['headers' => ['sessionId' => $sessionId]]);
-        $data1 = json_decode($response1->body(),true);
+        $data1 = json_decode($response1->getStringBody(), true);
         foreach($data as $key=>$value){
                 $data[$key]['queueName']='';
                 $filterBy= $data[$key]['currentCallAgentQueueId'];
@@ -558,7 +558,7 @@ class SeatsController extends AppController{
 
         $http = new Client();
         $response = $http->get($url, [], []);
-        $data = json_decode($response->body(),true);
+        $data = json_decode($response->getStringBody(), true);
 
         //debug($response);
         //debug($data);
