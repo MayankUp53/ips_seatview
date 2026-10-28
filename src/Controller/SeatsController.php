@@ -40,7 +40,7 @@ class SeatsController extends AppController{
         if (empty($sessionId)){
             //セッションエラー
             $this->Flash->error(__('セッションエラー'));
-            $this->redirect(array('controller' => 'users', 'action' => 'login'));
+            return $this->redirect(['controller' => 'users', 'action' => 'login']);
         }
 
 		//セッション（ページリダイレクト後に子画面を閉じる為に使用）を削除する
@@ -57,7 +57,10 @@ class SeatsController extends AppController{
         if ($res == "error"){
             $id = $session->read('id');
             $pass = $session->read('pass');
-            $this->autoReLogin($id,$pass); //Re-Create New SessionId
+            $response = $this->autoReLogin($id, $pass);
+            if ($response !== null) {
+                return $response;
+            }
             $sessionId = $session->read('sessionId');
         }
 
@@ -87,7 +90,10 @@ class SeatsController extends AppController{
                 //debug($sessionId);
                 $id = $session->read('id');
                 $pass = $session->read('pass');
-                $this->autoReLogin($id,$pass); //Re-Create New SessionId
+                $response = $this->autoReLogin($id, $pass);
+                if ($response !== null) {
+                    return $response;
+                }
                 $sessionId = $session->read('sessionId');
             }
 
@@ -465,6 +471,10 @@ class SeatsController extends AppController{
         //アメヨのセッションID
         $session = $this->request->getSession();
         $sessionId = $session->read('sessionId');
+        if (empty($sessionId)) {
+            $this->Flash->error(__('セッションエラー'));
+            return $this->redirect(['controller' => 'users', 'action' => 'login']);
+        }
 
         //Calling Ping-Session API
         $res = $this->pingSessionAPI($sessionId);
@@ -473,7 +483,10 @@ class SeatsController extends AppController{
         if ($res === "error"){
             $id = $session->read('id');
             $pass = $session->read('pass');
-            $this->autoReLogin($id,$pass); //Re-Create New SessionId
+            $response = $this->autoReLogin($id, $pass);
+            if ($response !== null) {
+                return $response;
+            }
             $sessionId = $session->read('sessionId');
         }
 
@@ -576,11 +589,12 @@ class SeatsController extends AppController{
         }
 
     }
-    public function autoReLogin($id,$pass){
+    public function autoReLogin($id, $pass): ?\Cake\Http\Response{
         $url = 'http://c025.ameyoj.com:8888/ameyorestapi/session/login';
 
         if (empty($id) || empty($pass)){
-            $this->redirect(array('controller' => 'users', 'action' => 'logout'));
+            $this->request->getSession()->destroy();
+            return $this->redirect(['controller' => 'users', 'action' => 'login']);
         }
 
         $option = [
@@ -592,7 +606,7 @@ class SeatsController extends AppController{
 
         $http = new Client();
         $response = $http->post($url,json_encode($option),['type' => 'json']);
-        $data = json_decode($response->body(),true);
+        $data = json_decode($response->getStringBody(), true);
 
         if (isset($data['userId']) == true){
 
@@ -608,12 +622,14 @@ class SeatsController extends AppController{
             ]);
             if (empty($session->read('sessionId'))){
                 $this->Flash->error(__('AmeyoJからセッション情報が取得できませんでした'));
-                return $this->redirect(array('controller' => 'users', 'action' => 'login'));
+                return $this->redirect(['controller' => 'users', 'action' => 'login']);
             }else{
-                //return "ok";
+                return null;
             }
         }else{
-            return $this->redirect(array('controller' => 'users', 'action' => 'login'));
+            $this->request->getSession()->destroy();
+            $this->Flash->error(__('AmeyoJからセッション情報が取得できませんでした'));
+            return $this->redirect(['controller' => 'users', 'action' => 'login']);
         }
 
     }

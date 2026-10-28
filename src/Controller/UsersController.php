@@ -260,7 +260,7 @@ class UsersController extends AppController{
 		 //print_r($session); die;
         $session->destroy();
 
-        return $this->redirect(array('controller' => 'users', 'action' => 'login'));
+        return $this->redirect('/');
         //return $this->redirect($this->Auth->logout());
         /*$session = $this->request->getSession();
 
