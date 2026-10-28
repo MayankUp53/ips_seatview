@@ -17,7 +17,6 @@ namespace App\Controller;
 use Cake\Controller\Controller;
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Application Controller
@@ -39,7 +38,7 @@ class AppController extends Controller
         return $baseUrl . '/' . ltrim($endpoint, '/');
     }
 
-    public function beforeFilter(EventInterface $event): ?ResponseInterface
+    public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
 
