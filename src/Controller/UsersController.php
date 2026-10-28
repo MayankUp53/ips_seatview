@@ -212,6 +212,7 @@ class UsersController extends AppController{
     }
 
     public function login(){
+        $this->viewBuilder()->disableAutoLayout();
         
         if ($this->request->is('post')) {
 
@@ -231,9 +232,6 @@ class UsersController extends AppController{
             }
             
         }
-
-        //Default.ctpを使わない
-        $this->viewBuilder()->setLayout(null);
 
     }
 	public function logoutAPI($sessionId){

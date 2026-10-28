@@ -75,6 +75,11 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
     </head>
 
     <body>
+        <?php
+            $isLoginPage = strtolower((string)$this->request->getParam('controller')) === 'users'
+                && strtolower((string)$this->request->getParam('action')) === 'login';
+        ?>
+        <?php if (!$isLoginPage): ?>
         <header>
             <?= $this->Flash->render() ?>
             <?php
@@ -129,15 +134,18 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
                 </div>
             </div>
         </header>
+        <?php endif; ?>
 
 
         <div class="container clearfix">
             <?= $this->fetch('content') ?>
         </div>
+        <?php if (!$isLoginPage): ?>
         <footer>
             <div align="center">
             <p>Copyright © 2023 IPS All Rights Reserved.</p>
             </div>
         </footer>
+        <?php endif; ?>
     </body>
 </html>
