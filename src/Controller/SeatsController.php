@@ -489,12 +489,12 @@ class SeatsController extends AppController{
         $url = "http://c025.ameyoj.com:8888/ameyorestapi/voice/userVoiceCampaignRuntimes/getByCampaign?campaignId=1";
 
         $http = new Client();
-        $response = $http->get($url,null,['headers' => ['sessionId' => $sessionId]]);
+        $response = $http->get($url, [], ['headers' => ['sessionId' => $sessionId]]);
         $data = json_decode($response->body(),true);
 
 /************************/
 	$queueListURL= "http://c025.ameyoj.com:8888/ameyorestapi/cc/agentQueues/getByCampaign?campaignId=1";
-        $response1 = $http->get($queueListURL,null,['headers' => ['sessionId' => $sessionId]]);
+        $response1 = $http->get($queueListURL, [], ['headers' => ['sessionId' => $sessionId]]);
         $data1 = json_decode($response1->body(),true);
         foreach($data as $key=>$value){
                 $data[$key]['queueName']='';
@@ -511,7 +511,7 @@ class SeatsController extends AppController{
 /***********************/
 /************************/
 	/*$agentListURL= "http://c025.ameyoj.com:8888/ameyorestapi/cc/userCCPresences";
-        $response2 = $http->get($agentListURL,null,['headers' => ['sessionId' => $sessionId]]);
+        $response2 = $http->get($agentListURL, [], ['headers' => ['sessionId' => $sessionId]]);
         $data2 = json_decode($response2->body(),true);
 		foreach($data as $key=>$value){
 			$data[$key]['isOnAutoCall']='';
@@ -557,7 +557,7 @@ class SeatsController extends AppController{
         $url = "http://c025.ameyoj.com:8888/ameyowebaccess/command?command=ping-session&data={\"sessionId\":\"".$sessionId."\"}";
 
         $http = new Client();
-        $response = $http->get($url,null,[]);
+        $response = $http->get($url, [], []);
         $data = json_decode($response->body(),true);
 
         //debug($response);
