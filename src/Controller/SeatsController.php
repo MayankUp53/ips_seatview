@@ -550,27 +550,30 @@ class SeatsController extends AppController{
     private function decodeAmeyoListResponse(ClientResponse $response, string $endpoint): array
     {
         if (!$response->isSuccess()) {
-            throw new \RuntimeException(sprintf(
-                'Ameyo API endpoint "%s" returned HTTP %d.',
+            $this->log(sprintf(
+                'Ameyo API endpoint "%s" returned HTTP %d; Seat Viewer data will be empty.',
                 $endpoint,
                 $response->getStatusCode()
-            ));
+            ), 'error');
+            return [];
         }
 
         $data = json_decode($response->getStringBody(), true);
         if (!is_array($data) || !array_is_list($data)) {
-            throw new \RuntimeException(sprintf(
+            $this->log(sprintf(
                 'Ameyo API endpoint "%s" returned an unexpected response; expected a JSON list of records.',
                 $endpoint
-            ));
+            ), 'error');
+            return [];
         }
 
         foreach ($data as $record) {
             if (!is_array($record)) {
-                throw new \RuntimeException(sprintf(
+                $this->log(sprintf(
                     'Ameyo API endpoint "%s" returned a record with an unexpected format.',
                     $endpoint
-                ));
+                ), 'error');
+                return [];
             }
         }
 
