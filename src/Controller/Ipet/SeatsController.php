@@ -1,11 +1,10 @@
 <?php
 namespace App\Controller\Ipet;
 
-use App\Controller\AppController;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 
-class SeatsController extends AppController
+class SeatsController
 {
     private const GRID = [
         'aomori' => ['title' => '【青森】', 'rows' => 6, 'columns' => 10, 'startRow' => 1],
