@@ -82,11 +82,14 @@ $cakeDescription = 'AmeyoJ Seat Viewer';
                     $list_active = null;
                     $user_active = null;
 
-                    if($this->request->url == 'seats'){
+                    $controller = strtolower((string)$this->request->getParam('controller'));
+                    $action = strtolower((string)$this->request->getParam('action'));
+
+                    if($controller === 'seats' && $action === 'index'){
                         $seatview_active = "active";	
-                    }elseif($this->request->url == 'seats/list'){
+                    }elseif($controller === 'seats' && $action === 'list'){
                         $list_active = "active";
-                    }elseif($this->request->url == 'users'){
+                    }elseif($controller === 'users' && $action === 'index'){
                         $user_active = "active";
                     }
                 ?>
