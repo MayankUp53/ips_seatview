@@ -38,15 +38,11 @@ class UsersController extends AppController{
             $this->redirect(array('controller' => 'users', 'action' => 'login'));
         }
 
-        $this->paginate = [
-            'limit' => 20,
-            'conditions' => ['deleted is null'],
-            'order' => [
-                'User.id' => 'asc'
-            ]
-        ];
+        $usersQuery = $this->Users->find()
+            ->where(['Users.deleted IS' => null])
+            ->orderBy(['Users.id' => 'ASC']);
 
-        $users = $this->paginate($this->Users);
+        $users = $this->paginate($usersQuery, ['limit' => 20]);
 
         $this->set(compact('users'));
         //$this->setListValue();
