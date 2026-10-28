@@ -7,6 +7,7 @@ use Cake\Routing\Router; //追加
 
 //API実行用
 use Cake\Http\Client;
+use Cake\Http\Client\Response as ClientResponse;
 use Cake\Http\Response;
 
 /**
@@ -503,22 +504,25 @@ class SeatsController extends AppController{
 
         $http = new Client();
         $response = $http->get($url, [], ['headers' => ['sessionId' => $sessionId]]);
-        $data = json_decode($response->getStringBody(), true);
+        $data = $this->decodeAmeyoListResponse($response, 'userVoiceCampaignRuntimes');
 
 /************************/
 	$queueListURL = $this->ameyoApiUrl('/ameyorestapi/cc/agentQueues/getByCampaign?campaignId=1');
         $response1 = $http->get($queueListURL, [], ['headers' => ['sessionId' => $sessionId]]);
-        $data1 = json_decode($response1->getStringBody(), true);
-        foreach($data as $key=>$value){
-                $data[$key]['queueName']='';
-                $filterBy= $data[$key]['currentCallAgentQueueId'];
-                if ($filterBy!=null){
-                        $new = array_filter($data1, function ($var) use($filterBy) {
+        $data1 = $this->decodeAmeyoListResponse($response1, 'agentQueues');
+        foreach ($data as $key => $value) {
+            $data[$key]['queueName'] = '';
+            $filterBy = $value['currentCallAgentQueueId'] ?? null;
+            if ($filterBy === null) {
+                continue;
+            }
 
-                         return ($var['agentQueueId'] == $filterBy);
-                        });
-                        $data[$key]['queueName']=$new[0]['queueName'];
+            foreach ($data1 as $queue) {
+                if (($queue['agentQueueId'] ?? null) == $filterBy) {
+                    $data[$key]['queueName'] = $queue['queueName'] ?? '';
+                    break;
                 }
+            }
         }
 
 /***********************/
@@ -542,6 +546,37 @@ class SeatsController extends AppController{
         //debug($data);
         return $data;
     }
+
+    private function decodeAmeyoListResponse(ClientResponse $response, string $endpoint): array
+    {
+        if (!$response->isSuccess()) {
+            throw new \RuntimeException(sprintf(
+                'Ameyo API endpoint "%s" returned HTTP %d.',
+                $endpoint,
+                $response->getStatusCode()
+            ));
+        }
+
+        $data = json_decode($response->getStringBody(), true);
+        if (!is_array($data) || !array_is_list($data)) {
+            throw new \RuntimeException(sprintf(
+                'Ameyo API endpoint "%s" returned an unexpected response; expected a JSON list of records.',
+                $endpoint
+            ));
+        }
+
+        foreach ($data as $record) {
+            if (!is_array($record)) {
+                throw new \RuntimeException(sprintf(
+                    'Ameyo API endpoint "%s" returned a record with an unexpected format.',
+                    $endpoint
+                ));
+            }
+        }
+
+        return $data;
+    }
+
     //セッションタイマーを延長させる
     public function keepAliveAPI($sessionId = null){
 
@@ -732,6 +767,7 @@ class SeatsController extends AppController{
         keyField: 'user_id',
         valueField: 'extension')
         ->where(['deleted is null'])
+        ->whereNotNull('user_id')
         ->toArray();
 
         //ユーザ名
