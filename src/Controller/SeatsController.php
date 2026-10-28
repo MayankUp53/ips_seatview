@@ -500,14 +500,17 @@ class SeatsController extends AppController{
     //アメヨユーザ情報を取得
     public function restAPI($sessionId = null){
 
-        $url = $this->ameyoApiUrl('/ameyorestapi/voice/userVoiceCampaignRuntimes/getByCampaign?campaignId=1');
+        $campaignId = (string)\Cake\Core\Configure::read('Ameyo.campaignId', '1');
+        $campaignId = rawurlencode($campaignId);
+
+        $url = $this->ameyoApiUrl('/ameyorestapi/voice/userVoiceCampaignRuntimes/getByCampaign?campaignId=' . $campaignId);
 
         $http = new Client();
         $response = $http->get($url, [], ['headers' => ['sessionId' => $sessionId]]);
         $data = $this->decodeAmeyoListResponse($response, 'userVoiceCampaignRuntimes');
 
 /************************/
-	$queueListURL = $this->ameyoApiUrl('/ameyorestapi/cc/agentQueues/getByCampaign?campaignId=1');
+	$queueListURL = $this->ameyoApiUrl('/ameyorestapi/cc/agentQueues/getByCampaign?campaignId=' . $campaignId);
         $response1 = $http->get($queueListURL, [], ['headers' => ['sessionId' => $sessionId]]);
         $data1 = $this->decodeAmeyoListResponse($response1, 'agentQueues');
         foreach ($data as $key => $value) {

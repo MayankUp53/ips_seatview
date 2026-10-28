@@ -60,6 +60,7 @@ return [
 
     'Ameyo' => [
         'apiBaseUrl' => env('AMEYO_API_BASE_URL', 'http://c025.ameyoj.com:8888'),
+        'campaignId' => env('AMEYO_CAMPAIGN_ID', '1'),
     ],
 
     /**
