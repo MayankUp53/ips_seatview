@@ -175,7 +175,7 @@ class UsersController extends AppController{
         }
     }
     public function loginAPI($id,$pass){
-        $url = 'http://c025.ameyoj.com:8888/ameyorestapi/session/login';
+        $url = $this->ameyoApiUrl('/ameyorestapi/session/login');
 
         $option = [
                 'token' => $pass,
@@ -236,7 +236,7 @@ class UsersController extends AppController{
     }
 	public function logoutAPI($sessionId){
 			//echo "Hi"; die;
-        $url = 'http://c025.ameyoj.com:8888/ameyorestapi/session/userLogout';
+        $url = $this->ameyoApiUrl('/ameyorestapi/session/userLogout');
         $header = [
             'sessionId' => $sessionId,
             'Content-Type' => "application/json"

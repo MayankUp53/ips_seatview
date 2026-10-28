@@ -499,14 +499,14 @@ class SeatsController extends AppController{
     //アメヨユーザ情報を取得
     public function restAPI($sessionId = null){
 
-        $url = "http://c025.ameyoj.com:8888/ameyorestapi/voice/userVoiceCampaignRuntimes/getByCampaign?campaignId=1";
+        $url = $this->ameyoApiUrl('/ameyorestapi/voice/userVoiceCampaignRuntimes/getByCampaign?campaignId=1');
 
         $http = new Client();
         $response = $http->get($url, [], ['headers' => ['sessionId' => $sessionId]]);
         $data = json_decode($response->getStringBody(), true);
 
 /************************/
-	$queueListURL= "http://c025.ameyoj.com:8888/ameyorestapi/cc/agentQueues/getByCampaign?campaignId=1";
+	$queueListURL = $this->ameyoApiUrl('/ameyorestapi/cc/agentQueues/getByCampaign?campaignId=1');
         $response1 = $http->get($queueListURL, [], ['headers' => ['sessionId' => $sessionId]]);
         $data1 = json_decode($response1->getStringBody(), true);
         foreach($data as $key=>$value){
@@ -523,7 +523,7 @@ class SeatsController extends AppController{
 
 /***********************/
 /************************/
-	/*$agentListURL= "http://c025.ameyoj.com:8888/ameyorestapi/cc/userCCPresences";
+	/*$agentListURL = $this->ameyoApiUrl('/ameyorestapi/cc/userCCPresences');
         $response2 = $http->get($agentListURL, [], ['headers' => ['sessionId' => $sessionId]]);
         $data2 = json_decode($response2->body(),true);
 		foreach($data as $key=>$value){
@@ -545,7 +545,7 @@ class SeatsController extends AppController{
     //セッションタイマーを延長させる
     public function keepAliveAPI($sessionId = null){
 
-        $url = 'http://c025.ameyoj.com:8888/ameyorestapi/session/keepAlive';
+        $url = $this->ameyoApiUrl('/ameyorestapi/session/keepAlive');
 
         $header = [
             'sessionId' => $sessionId,
@@ -567,7 +567,7 @@ class SeatsController extends AppController{
     //SessionIdが有効であるか判定する
     public function pingSessionAPI($sessionId = null){
 
-        $url = "http://c025.ameyoj.com:8888/ameyowebaccess/command?command=ping-session&data={\"sessionId\":\"".$sessionId."\"}";
+        $url = $this->ameyoApiUrl('/ameyowebaccess/command?command=ping-session&data={' . '"sessionId":"' . $sessionId . '"}');
 
         $http = new Client();
         $response = $http->get($url, [], []);
@@ -590,7 +590,7 @@ class SeatsController extends AppController{
 
     }
     public function autoReLogin($id, $pass): ?\Cake\Http\Response{
-        $url = 'http://c025.ameyoj.com:8888/ameyorestapi/session/login';
+        $url = $this->ameyoApiUrl('/ameyorestapi/session/login');
 
         if (empty($id) || empty($pass)){
             $this->request->getSession()->destroy();

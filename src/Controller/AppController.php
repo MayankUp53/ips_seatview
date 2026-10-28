@@ -15,6 +15,7 @@
 namespace App\Controller;
 
 use Cake\Controller\Controller;
+use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -28,6 +29,16 @@ use Psr\Http\Message\ResponseInterface;
  */
 class AppController extends Controller
 {
+    protected function ameyoApiUrl(string $endpoint): string
+    {
+        $baseUrl = rtrim((string)Configure::read('Ameyo.apiBaseUrl'), '/');
+        if ($baseUrl === '') {
+            throw new \RuntimeException('AMEYO_API_BASE_URL must be configured.');
+        }
+
+        return $baseUrl . '/' . ltrim($endpoint, '/');
+    }
+
     public function beforeFilter(EventInterface $event): ?ResponseInterface
     {
         parent::beforeFilter($event);
