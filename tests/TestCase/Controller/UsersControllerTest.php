@@ -24,6 +24,13 @@ class UsersControllerTest extends TestCase
         'app.deleted_users'
     ];
 
+    public function testUnauthenticatedRequestRedirectsToLogin(): void
+    {
+        $this->get('/users/index');
+
+        $this->assertRedirect('/users/login');
+    }
+
     /**
      * Test index method
      *

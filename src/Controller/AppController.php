@@ -15,7 +15,8 @@
 namespace App\Controller;
 
 use Cake\Controller\Controller;
-use Cake\Event\Event;
+use Cake\Event\EventInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Application Controller
@@ -27,6 +28,24 @@ use Cake\Event\Event;
  */
 class AppController extends Controller
 {
+    public function beforeFilter(EventInterface $event): ?ResponseInterface
+    {
+        parent::beforeFilter($event);
+
+        $controller = strtolower((string)$this->request->getParam('controller'));
+        $action = strtolower((string)$this->request->getParam('action'));
+        if ($controller === 'users' && $action === 'login') {
+            return null;
+        }
+
+        if (empty($this->request->getSession()->read('sessionId'))) {
+            $this->Flash->error(__('セッションエラー'));
+
+            return $this->redirect(['controller' => 'users', 'action' => 'login']);
+        }
+
+        return null;
+    }
 
     /**
      * Initialization hook method.
