@@ -28,7 +28,7 @@ class UsersControllerTest extends TestCase
     {
         $this->get('/users/index');
 
-        $this->assertRedirect('/users/login');
+        $this->assertRedirect('/');
     }
 
     /**

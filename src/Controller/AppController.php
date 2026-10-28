@@ -41,7 +41,7 @@ class AppController extends Controller
         if (empty($this->request->getSession()->read('sessionId'))) {
             $this->Flash->error(__('セッションエラー'));
 
-            return $this->redirect(['controller' => 'users', 'action' => 'login']);
+            return $this->redirect('/');
         }
 
         return null;
