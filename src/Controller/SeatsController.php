@@ -2,6 +2,8 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use App\Controller\Ipet\SeatsController as IpetSeatsController;
+use Cake\Core\Configure;
 use Cake\ORM\TableRegistry; //追加
 use Cake\Routing\Router; //追加
 
@@ -18,6 +20,12 @@ use Cake\Http\Response;
  * @method \App\Model\Entity\User[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
 class SeatsController extends AppController{
+
+    private function isIpetSeatView(): bool
+    {
+        $base = rtrim((string)Configure::read('App.base', ''), '/');
+        return strtolower($base) === '/ipet_seatviewer';
+    }
 
     public function initialize(): void{
         //$this->loadComponent('RequestHandler'); // Ajax用コンポーネント
@@ -68,6 +76,10 @@ class SeatsController extends AppController{
         //Calling Keep Alive API
         $this->keepAliveAPI($sessionId);
 
+        if ($this->isIpetSeatView()) {
+            $this->viewBuilder()->setTemplate('Ipet/index');
+        }
+
         //Calling Rest API
         $this->restAPI($sessionId);
 
@@ -103,6 +115,11 @@ class SeatsController extends AppController{
 
             //Calling Rest API
             $data = $this->restAPI($sessionId);
+
+            if ($this->isIpetSeatView()) {
+                echo IpetSeatsController::render($data);
+                return;
+            }
 
             //HTMLを生成する
             $html = "";
@@ -509,40 +526,37 @@ class SeatsController extends AppController{
         $response = $http->get($url, [], ['headers' => ['sessionId' => $sessionId]]);
         $data = $this->decodeAmeyoListResponse($response, 'userVoiceCampaignRuntimes');
 
-/************************/
-	$queueListURL = $this->ameyoApiUrl('/ameyorestapi/cc/agentQueues/getByCampaign?campaignId=' . $campaignId);
-        $response1 = $http->get($queueListURL, [], ['headers' => ['sessionId' => $sessionId]]);
-        $data1 = $this->decodeAmeyoListResponse($response1, 'agentQueues');
-        foreach ($data as $key => $value) {
-            $data[$key]['queueName'] = '';
-            $filterBy = $value['currentCallAgentQueueId'] ?? null;
-            if ($filterBy === null) {
-                continue;
+        if ($this->isIpetSeatView()) {
+            $agentListURL = $this->ameyoApiUrl('/ameyorestapi/cc/userCCPresences');
+            $response2 = $http->get($agentListURL, [], ['headers' => ['sessionId' => $sessionId]]);
+            $data2 = $this->decodeAmeyoListResponse($response2, 'userCCPresences');
+            foreach ($data as $key => $value) {
+                $data[$key]['isOnAutoCall'] = false;
+                foreach ($data2 as $presence) {
+                    if (($presence['sessionId'] ?? null) === ($value['sessionId'] ?? null)) {
+                        $data[$key]['isOnAutoCall'] = $presence['isOnAutoCall'] ?? false;
+                        break;
+                    }
+                }
             }
-
-            foreach ($data1 as $queue) {
-                if (($queue['agentQueueId'] ?? null) == $filterBy) {
-                    $data[$key]['queueName'] = $queue['queueName'] ?? '';
-                    break;
+        } else {
+            $queueListURL = $this->ameyoApiUrl('/ameyorestapi/cc/agentQueues/getByCampaign?campaignId=' . $campaignId);
+            $response1 = $http->get($queueListURL, [], ['headers' => ['sessionId' => $sessionId]]);
+            $data1 = $this->decodeAmeyoListResponse($response1, 'agentQueues');
+            foreach ($data as $key => $value) {
+                $data[$key]['queueName'] = '';
+                $filterBy = $value['currentCallAgentQueueId'] ?? null;
+                if ($filterBy === null) {
+                    continue;
+                }
+                foreach ($data1 as $queue) {
+                    if (($queue['agentQueueId'] ?? null) == $filterBy) {
+                        $data[$key]['queueName'] = $queue['queueName'] ?? '';
+                        break;
+                    }
                 }
             }
         }
-
-/***********************/
-/************************/
-	/*$agentListURL = $this->ameyoApiUrl('/ameyorestapi/cc/userCCPresences');
-        $response2 = $http->get($agentListURL, [], ['headers' => ['sessionId' => $sessionId]]);
-        $data2 = json_decode($response2->body(),true);
-		foreach($data as $key=>$value){
-			$data[$key]['isOnAutoCall']='';
-			foreach ($data2 as $key2 =>$value2){
-				if($data2[$key2]['sessionId']==$data[$key]['sessionId']){
-					$data[$key]['isOnAutoCall']=$data2[$key2]['isOnAutoCall'];
-				}
-			}
-		}      
-*/
-/***********************/
 
 
         $this->set(compact('data'));
