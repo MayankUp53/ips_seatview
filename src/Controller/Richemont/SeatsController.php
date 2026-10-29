@@ -42,7 +42,15 @@ class SeatsController
                 }
             }
         }
-        return sprintf('<td style="min-width:300px" ondblclick="window.open(\'%s%s\',null,\'width=400,height=300\');" %s>%s<br>%s<br>%s<br><span>%s</span><br>%s</td>', $editUrl, $location, $seat['class'], $seat['extension'], $seat['userName'], $seat['userId'], $seat['status'], $seat['time']);
+        return sprintf('<td ondblclick="window.open(\'%s%s\',null,\'width=400,height=300\');" style="min-width:300px;%s">%s<br>%s<br>%s<br><span>%s</span><br>%s</td>', $editUrl, $location, self::extractStyleDeclaration($seat['class']), $seat['extension'], $seat['userName'], $seat['userId'], $seat['status'], $seat['time']);
+    }
+
+    private static function extractStyleDeclaration(string $classAttribute): string
+    {
+        if (preg_match('/style="([^"]*)"/', $classAttribute, $matches)) {
+            return $matches[1];
+        }
+        return '';
     }
 
     private static function updateStatus(array $seat, array $api): array
