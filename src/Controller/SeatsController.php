@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Controller\AppController;
 use App\Controller\Ipet\SeatsController as IpetSeatsController;
+use App\Controller\Richemont\SeatsController as RichemontSeatsController;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry; //追加
 use Cake\Routing\Router; //追加
@@ -25,6 +26,12 @@ class SeatsController extends AppController{
     {
         $base = rtrim((string)Configure::read('App.base', ''), '/');
         return strtolower($base) === '/ipet_seatviewer';
+    }
+
+    private function isRichemontSeatView(): bool
+    {
+        $base = rtrim((string)Configure::read('App.base', ''), '/');
+        return strtolower($base) === '/richemont_seatviewer';
     }
 
     public function initialize(): void{
@@ -78,6 +85,8 @@ class SeatsController extends AppController{
 
         if ($this->isIpetSeatView()) {
             $this->viewBuilder()->setTemplate('Ipet/index');
+        } elseif ($this->isRichemontSeatView()) {
+            $this->viewBuilder()->setTemplate('Richemont/index');
         }
 
         //Calling Rest API
@@ -85,6 +94,47 @@ class SeatsController extends AppController{
 
         //$this->setListValue();
     }
+    public function waitingcalls(){
+        $this->autoRender = false;
+        $session = $this->request->getSession();
+        $sessionId = $session->read('sessionId');
+
+        if ($this->pingSessionAPI($sessionId) === 'error') {
+            $id = $session->read('id');
+            $pass = $session->read('pass');
+            $response = $this->autoReLogin($id, $pass);
+            if ($response !== null) {
+                return $response;
+            }
+            $sessionId = $session->read('sessionId');
+        }
+
+        $this->keepAliveAPI($sessionId);
+        $campaignId = rawurlencode($this->isRichemontSeatView()
+            ? '13'
+            : (string)Configure::read('Ameyo.campaignId', '13'));
+        $http = new Client();
+        $queueUrl = $this->ameyoApiUrl('/ameyorestapi/cc/agentQueues/getByCampaign?campaignId=' . $campaignId);
+        $queueResponse = $http->get($queueUrl, [], ['headers' => ['sessionId' => $sessionId]]);
+        $queues = $this->decodeAmeyoListResponse($queueResponse, 'agentQueues');
+
+        $pending = 0;
+        foreach ($queues as $queue) {
+            $queueId = $queue['agentQueueId'] ?? null;
+            if ($queueId === null) {
+                continue;
+            }
+            $modelUrl = $this->ameyoApiUrl('/ameyorestapi/cc/agentQueueModels/' . rawurlencode((string)$queueId));
+            $modelResponse = $http->get($modelUrl, [], ['headers' => ['sessionId' => $sessionId]]);
+            $model = $modelResponse->isSuccess() ? json_decode($modelResponse->getStringBody(), true) : [];
+            $pending += (int)($model['requestsPending'] ?? 0);
+        }
+
+        echo '<table style="font-size:32px;width:80%;margin-left:25px;margin-top:10px" border="0" cellpadding="3"><tbody>';
+        echo '<tr><th>待ち呼状況</th><td>CSC : ' . $pending . '</td></tr>';
+        echo '</tbody></table>';
+    }
+
     public function ajax(){
 
         $this->autoRender = false;
@@ -118,6 +168,10 @@ class SeatsController extends AppController{
 
             if ($this->isIpetSeatView()) {
                 echo IpetSeatsController::render($data);
+                return;
+            }
+            if ($this->isRichemontSeatView()) {
+                echo RichemontSeatsController::render($data);
                 return;
             }
 
@@ -517,7 +571,9 @@ class SeatsController extends AppController{
     //アメヨユーザ情報を取得
     public function restAPI($sessionId = null){
 
-        $campaignId = (string)\Cake\Core\Configure::read('Ameyo.campaignId', '1');
+        $campaignId = $this->isRichemontSeatView()
+            ? '13'
+            : (string)\Cake\Core\Configure::read('Ameyo.campaignId', '1');
         $campaignId = rawurlencode($campaignId);
 
         $url = $this->ameyoApiUrl('/ameyorestapi/voice/userVoiceCampaignRuntimes/getByCampaign?campaignId=' . $campaignId);
