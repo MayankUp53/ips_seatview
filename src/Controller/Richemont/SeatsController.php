@@ -36,7 +36,10 @@ class SeatsController
             $userData = $users->find()->where(['user_id' => $seat['userId'], 'deleted is null'])->first();
             if ($userData) { $seat['userName'] = mb_substr((string)$userData->user_name, 0, 10); }
             foreach ($data as $apiData) {
-                if (($apiData['userId'] ?? null) === $seat['userId']) { $seat = self::updateStatus($seat, $apiData); break; }
+                if ((string)($apiData['userId'] ?? '') === (string)$seat['userId']) {
+                    $seat = self::updateStatus($seat, $apiData);
+                    break;
+                }
             }
         }
         return sprintf('<td style="min-width:300px" ondblclick="window.open(\'%s%s\',null,\'width=400,height=300\');" %s>%s<br>%s<br>%s<br><span>%s</span><br>%s</td>', $editUrl, $location, $seat['class'], $seat['extension'], $seat['userName'], $seat['userId'], $seat['status'], $seat['time']);
